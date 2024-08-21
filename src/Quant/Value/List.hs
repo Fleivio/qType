@@ -7,14 +7,12 @@ module Value.List
   , module Data.Type.Equality
   , (<+>)
   , (<!!>)
-  , Maximum
-  , NoCloning
-  , ValidComposer
   , decompose
-  , toListOfInts
+  , compose
   ) where
 
 import           Data.Kind
+import           Data.List          (sortOn)
 import           Data.Proxy
 import           Data.Type.Equality
 import           Fcf                hiding (type (+), type (-), type (<=))
@@ -99,6 +97,13 @@ type family NoCloning (a :: [Natural]) :: Constraint
     (TypeError (Text "No Cloning Theorem Violated"))
     (NoCloning xs)
 
+type family NoZero (a :: [Natural]) :: Constraint
+ where
+  NoZero '[]     = ()
+  NoZero (0 : _) = TypeError
+    (Text "Invalid Zero Index, Type-Level Lists are indexed starting at 1")
+  NoZero (_ : xs) = NoZero xs
+
 type family ValidDecomposer (accessors :: [Natural]) (size :: Natural) :: Constraint
  where
   ValidDecomposer acs size = ( If
@@ -107,12 +112,7 @@ type family ValidDecomposer (accessors :: [Natural]) (size :: Natural) :: Constr
                                  (TypeError
                                     (Text
                                        "Index Out of Range on Access of Type Level Lists"))
-                             , If
-                                 (Elem 0 acs)
-                                 (TypeError
-                                    (Text
-                                       "Invalid Zero Index, Type-Level Lists are indexed starting at 1"))
-                                 (() :: Constraint)
+                             , NoZero acs
                              , NoCloning acs)
 
 type family Lenght (as :: [a]) :: Natural
@@ -128,13 +128,14 @@ type family ValidComposer (accessors :: [Natural]) (size :: Natural) :: Constrai
                                (TypeError
                                   (Text
                                      "Construction Out of Range on Access of Type Level Lists"))
-                           , If
-                               (Elem 0 acs)
-                               (TypeError
-                                  (Text
-                                     "Invalid Zero Index, Type-Level Lists are indexed starting at 1"))
-                               (() :: Constraint)
+                           , NoZero acs
                            , NoCloning acs)
+
+decompose' :: [Int] -> [a] -> ([a], [a])
+decompose' slist nlist = (selectionList, restList)
+  where
+    selectionList = flip (!!) . pred <$> slist <*> pure nlist
+    restList      = map snd $ filter ((`notElem` slist) . fst) $ [1 ..] `zip` nlist
 
 decompose ::
      forall acs n a. ValidDecomposer acs n
@@ -143,11 +144,27 @@ decompose ::
   -> (NList a (Lenght acs), NList a (n - Lenght acs))
 decompose slist nlist = (unsafeCoerce selectionList, unsafeCoerce restList)
   where
-    term_level_sList = toListOfInts slist
-    term_level_nList = toList nlist
-    selectionList =
-      flip (!!) . pred <$> term_level_sList <*> pure term_level_nList
-    restList =
-      map snd
-        $ filter ((`notElem` term_level_sList) . fst)
-        $ [1 ..] `zip` term_level_nList
+    term_level_sList          = toListOfInts slist
+    term_level_nList          = toList nlist
+    (selectionList, restList) = decompose' term_level_sList term_level_nList
+
+compose' :: [Int] -> [a] -> [a] -> [a]
+compose' slist selectionList restList = updatedList pairs restList
+  where
+    pairs = sortOn fst $ zip (pred <$> slist) selectionList
+    updatedList p acc =
+      case p of
+        []        -> acc
+        (i, x):xs -> updatedList xs $ take i acc ++ [x] ++ drop i acc
+
+compose ::
+     forall acs n a. ValidComposer acs n
+  => SList acs
+  -> NList a n
+  -> NList a (Lenght acs)
+  -> NList a (Lenght acs + n)
+compose slist nlist selectionList = unsafeCoerce $ compose' term_level_sList term_level_selectionList term_level_nList
+  where
+    term_level_sList          = toListOfInts slist
+    term_level_nList          = toList nlist
+    term_level_selectionList  = toList selectionList
