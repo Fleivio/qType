@@ -1,4 +1,6 @@
 module Main where
 
+import Quant(m1)
+
 main :: IO ()
-main = putStrLn "Hello, Haskell!"
+main = m1
