@@ -9,6 +9,7 @@ module Value.List
   , (<!!>)
   , Maximum
   , NoCloning
+  , ValidComposer
   , decompose
   , toListOfInts
   ) where
@@ -19,6 +20,8 @@ import           Data.Type.Equality
 import           Fcf                hiding (type (+), type (-), type (<=))
 import           GHC.TypeLits
 import           Unsafe.Coerce
+
+default (Int)
 
 type NList :: Type -> Natural -> Type
 
@@ -72,8 +75,9 @@ data SList list where
 infixr 4 :>>
 
 toListOfInts :: SList as -> [Int]
-toListOfInts SNil       = []
-toListOfInts ((SNat :: SNat a) :>> as) = fromIntegral (natVal (Proxy @a)) : toListOfInts as
+toListOfInts SNil = []
+toListOfInts ((SNat :: SNat a) :>> as) =
+  fromIntegral (natVal (Proxy @a)) : toListOfInts as
 
 type family Maximum (a :: [Natural]) :: Natural
  where
@@ -95,14 +99,35 @@ type family NoCloning (a :: [Natural]) :: Constraint
     (TypeError (Text "No Cloning Theorem Violated"))
     (NoCloning xs)
 
-type family ValidAccessor (accessors :: [Natural]) (size :: Natural) :: Constraint
+type family ValidDecomposer (accessors :: [Natural]) (size :: Natural) :: Constraint
  where
-  ValidAccessor acs size = ( If
-                               (Maximum acs <=? size)
+  ValidDecomposer acs size = ( If
+                                 (Maximum acs <=? size)
+                                 (() :: Constraint)
+                                 (TypeError
+                                    (Text
+                                       "Index Out of Range on Access of Type Level Lists"))
+                             , If
+                                 (Elem 0 acs)
+                                 (TypeError
+                                    (Text
+                                       "Invalid Zero Index, Type-Level Lists are indexed starting at 1"))
+                                 (() :: Constraint)
+                             , NoCloning acs)
+
+type family Lenght (as :: [a]) :: Natural
+ where
+  Lenght '[]      = 0
+  Lenght (a : as) = 1 + Lenght as
+
+type family ValidComposer (accessors :: [Natural]) (size :: Natural) :: Constraint
+ where
+  ValidComposer acs size = ( If
+                               (Maximum acs <=? Lenght acs + size)
                                (() :: Constraint)
                                (TypeError
                                   (Text
-                                     "Index Out of Range on Access of Type Level Lists"))
+                                     "Construction Out of Range on Access of Type Level Lists"))
                            , If
                                (Elem 0 acs)
                                (TypeError
@@ -111,13 +136,8 @@ type family ValidAccessor (accessors :: [Natural]) (size :: Natural) :: Constrai
                                (() :: Constraint)
                            , NoCloning acs)
 
-type family Lenght (as :: [a]) :: Natural
- where
-  Lenght '[]      = 0
-  Lenght (a : as) = 1 + Lenght as
-
 decompose ::
-     forall acs n a. ValidAccessor acs n
+     forall acs n a. ValidDecomposer acs n
   => SList acs
   -> NList a n
   -> (NList a (Lenght acs), NList a (n - Lenght acs))
@@ -125,6 +145,9 @@ decompose slist nlist = (unsafeCoerce selectionList, unsafeCoerce restList)
   where
     term_level_sList = toListOfInts slist
     term_level_nList = toList nlist
-
-    selectionList = flip (!!) . pred <$> term_level_sList <*> pure term_level_nList
-    restList = map snd $ filter ((`notElem` term_level_sList) . fst) $ [(1::Int)..] `zip` term_level_nList
+    selectionList =
+      flip (!!) . pred <$> term_level_sList <*> pure term_level_nList
+    restList =
+      map snd
+        $ filter ((`notElem` term_level_sList) . fst)
+        $ [1 ..] `zip` term_level_nList
