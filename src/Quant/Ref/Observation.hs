@@ -31,12 +31,14 @@ observeRef (QR ptr) = do
 
 -- indexed at 1
 observeN ::
-     forall a s n. Basis (NList a s)
-  => Basis (NList a (n - 1)) =>
-       Basis a =>
-         Basis (NList a (s - n)) =>
-         (1 <= n) =>
-           (n <= s) => QR a s -> SNat n -> IO (NList a 1)
+     forall a s n. 
+     Basis (NList a s)
+  => Basis (NList a (n - 1)) 
+  => Basis a 
+  => Basis (NList a (s - n)) 
+  => ValidDecomposer '[n] s => QR a s 
+  -> SNat n
+  -> IO (NList a 1)
 observeN (QR ptr) SNat = do
   qVal <- readIORef ptr
   let prob' a =

@@ -23,7 +23,7 @@ library quantum
         DataKinds, ConstraintKinds, TypeApplications, GADTs, AllowAmbiguousTypes,
         TypeFamilies, UndecidableInstances, TypeFamilies, RankNTypes, TypeOperators, 
         StandaloneKindSignatures, FlexibleInstances, ScopedTypeVariables, FlexibleContexts,
-        LambdaCase, MultiParamTypeClasses, PolyKinds
+        LambdaCase, MultiParamTypeClasses, PolyKinds, OverloadedLabels
 
     other-modules:
         Value.Basis
@@ -31,18 +31,23 @@ library quantum
         Value.Operator
         Value.PA
         Value.Value
+        Value.Gates
 
         Ref.Observation
         Ref.Ref
 
         Virt.Value
+        Virt.QState
+        Virt.Gates
+        Virt.Label
         
 
     build-depends:   
         base ^>=4.19.1.0,
         containers,
         random,
-        first-class-families
+        first-class-families,
+        mtl
 
 
     default-language: Haskell2010

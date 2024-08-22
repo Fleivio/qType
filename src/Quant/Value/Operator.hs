@@ -5,8 +5,8 @@ module Value.Operator
   , Qop(..)
   , Qop'
   , module Value.Value
-  , mkCQop
   , mkQop'
+  , mkCQop
   ) where
 
 import           Data.List
