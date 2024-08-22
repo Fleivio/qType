@@ -1,17 +1,15 @@
-module Quant(m1) where 
+module Quant( 
+  NList(..), Bin(..), Key, runQ, mkQ, printQ,
+  h, x, y, z, toffoli, cnot, p, s, t, fredkin, swap,
+  sample, measure
+  ) where 
 
 import Virt.Value
 import Virt.Gates
 
-entangle = do
-  h #1
-  sample --debug
-  cnot #1 #2
+mkQ ::
+     Basis (NList a s) => [(NList a s, PA)] -> IO (Virt a (CountTo s) s)
+mkQ = virtFromList
 
-m1 :: IO ()
-m1 = do
-  qr <- virtFromList [(O:>O:>I:>I:>NNil, 1)]
-  a <- runQ entangle qr
-  printVirt qr
-
-
+printQ :: Show a => Virt a acs t -> IO ()
+printQ = printVirt

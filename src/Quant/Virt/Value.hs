@@ -2,7 +2,6 @@ module Virt.Value
   ( Virt(..)
   , module Ref.Observation
   , module Virt.Label
-  , virtFromR
   , virtFromList
   , printVirt
   , virtFromV

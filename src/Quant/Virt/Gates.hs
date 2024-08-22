@@ -4,7 +4,6 @@ module Virt.Gates(
 
 import Virt.QState
 import Value.Gates
-import Virt.Label
 
 appGate :: forall acs t. 
   ValidDecomposer acs t -- Virt Bin acs t is a valid decomposition of t
