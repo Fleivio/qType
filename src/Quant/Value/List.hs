@@ -9,6 +9,9 @@ module Value.List
   , (<!!>)
   , decompose
   , compose
+  , CountTo
+  , Select
+  , Lenght
   ) where
 
 import           Data.Kind
@@ -131,6 +134,16 @@ type family ValidComposer (accessors :: [Natural]) (size :: Natural) :: Constrai
                            , NoZero acs
                            , NoCloning acs)
 
+type family (<++>) (as :: [a]) (bs :: [a]) :: [a]
+ where
+  '[] <++> bs = bs
+  (a : as) <++> bs = a : (as <++> bs)
+
+type family CountTo (n :: Natural) :: [Natural]
+ where
+  CountTo 0 = '[]
+  CountTo n = CountTo (n - 1) <++> '[n]
+
 decompose' :: [Int] -> [a] -> ([a], [a])
 decompose' slist nlist = (selectionList, restList)
   where
@@ -168,3 +181,12 @@ compose slist nlist selectionList = unsafeCoerce $ compose' term_level_sList ter
     term_level_sList          = toListOfInts slist
     term_level_nList          = toList nlist
     term_level_selectionList  = toList selectionList
+
+type family (as :: [a]) !! (n :: Natural) where
+  (a : as) !! 0 = a
+  (a : as) !! n = as !! (n - 1)
+  '[] !! n = TypeError (Text "Index Out of Range on Access of Type Level Lists") 
+
+type family Select (acs :: [Natural]) (t :: [a]) :: [a] where
+  Select '[] t = '[]
+  Select (a : as) t = t !! (a - 1) : Select as t

@@ -35,6 +35,7 @@ library quantum
         Ref.Observation
         Ref.Ref
 
+        Virt.Value
         
 
     build-depends:   
