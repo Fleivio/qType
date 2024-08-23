@@ -31,15 +31,14 @@ library quantum
         Value.Operator
         Value.PA
         Value.Value
-        Value.Gates
 
         Ref.Observation
         Ref.Ref
 
         Virt.Value
-        Virt.QState
-        Virt.Gates
         Virt.Label
+
+        Gates.Gates
         
 
     build-depends:   

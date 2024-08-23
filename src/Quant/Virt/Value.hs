@@ -2,9 +2,9 @@ module Virt.Value
   ( Virt(..)
   , module Ref.Observation
   , module Virt.Label
-  , virtFromList
-  , printVirt
-  , virtFromV
+  , mkQ
+  , printQ
+  , selectQ
   , app
   , measure
   ) where
@@ -21,19 +21,19 @@ data Virt a acs t =
 virtFromR :: QR a s -> Virt a (CountTo s) s
 virtFromR r = Virt r
 
-virtFromList ::
+mkQ ::
      Basis (NList a s) => [(NList a s, PA)] -> IO (Virt a (CountTo s) s)
-virtFromList = fmap virtFromR . qrFromList
+mkQ = fmap virtFromR . qrFromList
 
-printVirt :: Show a => Virt a acs t -> IO ()
-printVirt (Virt qr) = do
+printQ :: Show a => Virt a acs t -> IO ()
+printQ (Virt qr) = do
   printQR qr
 
-virtFromV ::
+selectQ ::
   forall n a acs t. 
     ValidDecomposer n (Length acs) 
      => Virt a acs t -> Virt a (Select n acs) t
-virtFromV = unsafeCoerce
+selectQ = unsafeCoerce
 
 app ::
      forall a acs s. Basis (NList a s)

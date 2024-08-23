@@ -1,15 +1,15 @@
 module Quant( 
-  NList(..), Bin(..), Key, runQ, mkQ, printQ,
-  h, x, y, z, toffoli, cnot, p, s, t, fredkin, swap,
-  sample, measure
+  NList(..), Bin(..), Key, mkQ, printQ,
+   m1
   ) where 
 
 import Virt.Value
-import Virt.Gates
+import Gates.Gates
 
-mkQ ::
-     Basis (NList a s) => [(NList a s, PA)] -> IO (Virt a (CountTo s) s)
-mkQ = virtFromList
+m1 :: IO ()
+m1 = do 
+  qr <- mkQ [(O:>O:>I:>I:>NNil, 1)]
+  let qr1 = selectQ @'[1] qr
+  app _h qr1
+  printQ qr
 
-printQ :: Show a => Virt a acs t -> IO ()
-printQ = printVirt
