@@ -116,7 +116,7 @@ type family ValidDecomposer (accessors :: [Natural]) (size :: Natural) :: Constr
                                     (Text
                                        "Index Out of Range on Access of Type Level Lists" 
                                        :$$: (Text "You Got ") :<>: (ShowType size) :<>: (Text " Qubits")
-                                       :$$: (Text "And Tried to Access the Index") :<>: (ShowType (Maximum acs)))
+                                       :$$: (Text "And Tried to Access the Index ") :<>: (ShowType (Maximum acs)))
                                        )
                              , ToListOfInts acs
                              , NoZero acs

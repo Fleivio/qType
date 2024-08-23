@@ -15,13 +15,13 @@ import Virt.Label
 
 type Virt :: Type -> [Natural] -> Natural -> Type
 
-data Virt a acs t =
-  Virt (QR a t)
+data Virt a acs t where
+  Virt :: ValidDecomposer acs t => QR a t -> Virt a acs t
 
-virtFromR :: QR a s -> Virt a (CountTo s) s
+virtFromR :: ValidDecomposer (CountTo s) s => QR a s -> Virt a (CountTo s) s
 virtFromR r = Virt r
 
-mkQ ::
+mkQ :: ValidDecomposer (CountTo s) s =>
      Basis (NList a s) => [(NList a s, PA)] -> IO (Virt a (CountTo s) s)
 mkQ = fmap virtFromR . qrFromList
 
