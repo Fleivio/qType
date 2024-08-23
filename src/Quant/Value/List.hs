@@ -36,8 +36,8 @@ infixr 3 :>
 
 instance Show a => Show (NList a s)
  where
-  show NNil      = "#"
-  show (a :> as) = show a ++ ":" ++ show as
+  show NNil      = ""
+  show (a :> as) = show a ++ show as
 
 instance Eq a => Eq (NList a s)
  where

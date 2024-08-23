@@ -15,8 +15,6 @@ _x = mkQop' [
       ((I:>NNil, O:>NNil), 1:+ 0)
     ]
 
-
-
 _y :: Qop Bin 1 1
 _y = mkQop' [
       ((O:>NNil, I:>NNil), (-1):+ 0),
