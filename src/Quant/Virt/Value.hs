@@ -31,14 +31,14 @@ printQ (Virt qr) = do
 
 selectQ ::
   forall n a acs t. 
-    ValidDecomposer n (Length acs) 
+    ValidDecomposer n (Length acs)
      => Virt a acs t -> Virt a (Select n acs) t
 selectQ = unsafeCoerce
 
 app ::
      forall a acs s. Basis (NList a s)
   => Basis a 
-  => ValidDecomposer acs s 
+  => ValidDecomposer acs s
   => Qop a (Length acs) (Length acs) -> Virt a acs s -> IO ()
 app f' (Virt (QR ptr)) = do
   qv <- readIORef ptr

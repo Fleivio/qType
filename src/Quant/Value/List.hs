@@ -8,15 +8,17 @@ module Value.List
   , (<!!>)
   , At
   , decompose
-  , compose
   , CountTo
   , Select
   , Length
   , ValidDecomposer
+  , ValidSubset
   ) where
 
 import           Data.Kind
-import           Data.List          (sortOn)
+
+
+-- import           Data.List          (sortOn)
 import           Data.Proxy
 import           Data.Type.Equality
 import           Fcf                hiding (Length, type (+), type (-),
@@ -97,7 +99,10 @@ type family NoCloning (a :: [Natural]) :: Constraint
   NoCloning '[]      = ()
   NoCloning (x : xs) = If
     (Elem x xs)
-    (TypeError (Text "No Cloning Theorem Violated"))
+    (TypeError
+       (Text "No Cloning Theorem Violated" :$$: Text
+          "You are trying to clone the index " :<>: ShowType x :<>: Text
+          " in the list"))
     (NoCloning xs)
 
 type family NoZero (a :: [Natural]) :: Constraint
@@ -114,10 +119,11 @@ type family ValidDecomposer (accessors :: [Natural]) (size :: Natural) :: Constr
                                  (() :: Constraint)
                                  (TypeError
                                     (Text
-                                       "Index Out of Range on Access of Type Level Lists" 
-                                       :$$: (Text "You Got ") :<>: (ShowType size) :<>: (Text " Qubits")
-                                       :$$: (Text "And Tried to Access the Index ") :<>: (ShowType (Maximum acs)))
-                                       )
+                                       "Index Out of Range on Access of Type Level Lists" :$$: Text
+                                       "You Got " :<>: ShowType size :<>: Text
+                                       " Qubits" :$$: Text
+                                       "And Tried to Access the Index " :<>: ShowType
+                                       (Maximum acs)))
                              , ToListOfInts acs
                              , NoZero acs
                              , NoCloning acs)
@@ -126,8 +132,6 @@ type family Length (as :: [a]) :: Natural
  where
   Length '[]      = 0
   Length (a : as) = 1 + Length as
-
-
 
 type family (<++>) (as :: [a]) (bs :: [a]) :: [a]
  where
@@ -138,18 +142,6 @@ type family CountTo (n :: Natural) :: [Natural]
  where
   CountTo 0 = '[]
   CountTo n = CountTo (n - 1) <++> '[ n]
-
-type family ValidComposer (accessors :: [Natural]) (size :: Natural) :: Constraint
- where
-  ValidComposer acs size = ( If
-                               (Maximum acs <=? Length acs + size)
-                               (() :: Constraint)
-                               (TypeError
-                                  (Text
-                                     "Construction Out of Range on Access of Type Level Lists"))
-                           , ToListOfInts acs
-                           , NoZero acs
-                           , NoCloning acs)
 
 decompose' :: [Int] -> [a] -> ([a], [a])
 decompose' slist nlist = (selectionList, restList)
@@ -167,37 +159,50 @@ decompose nlist = (unsafeCoerce selectionList, unsafeCoerce restList)
     term_level_nList          = toList nlist
     (selectionList, restList) = decompose' term_level_sList term_level_nList
 
-compose' :: [Int] -> [a] -> [a] -> [a]
-compose' slist selectionList restList = updatedList pairs restList
-  where
-    pairs = sortOn fst $ zip (pred <$> slist) selectionList
-    updatedList p acc =
-      case p of
-        []        -> acc
-        (i, x):xs -> updatedList xs $ take i acc ++ [x] ++ drop i acc
-
-compose ::
-     forall acs n a. ValidComposer acs n
-  => NList a n
-  -> NList a (Length acs)
-  -> NList a (Length acs + n)
-compose nlist selectionList =
-  unsafeCoerce
-    $ compose' term_level_sList term_level_selectionList term_level_nList
-  where
-    term_level_sList         = toListOfInts @acs
-    term_level_nList         = toList nlist
-    term_level_selectionList = toList selectionList
-
 type family At (as :: [a]) (n :: Natural)
  where
-  At (a : as) 0 = TypeError
-    (Text "Invalid Zero Index, Type-Level Lists are indexed starting at 1")
   At (a : as) 1 = a
   At (a : as) n = as `At` (n - 1)
-  At '[] n = TypeError (Text "Index Out of Range on Access of Type Level Lists")
 
 type family Select (acs :: [Natural]) (t :: [a]) :: [a]
  where
   Select '[] t      = '[]
   Select (a : as) t = t `At` a : Select as t
+
+type family ValidSubset (acs1 :: [Natural]) (acs2 :: [Natural]) (t :: Natural) :: Constraint
+  where
+    ValidSubset acs1 acs2 t = (ValidDecomposer acs2 t, ValidDecomposer acs1 (Length acs2), ValidDecomposer acs1 t)
+
+-- type family ValidComposer (accessors :: [Natural]) (size :: Natural) :: Constraint
+--  where
+--   ValidComposer acs size = ( If
+--                                (Maximum acs <=? Length acs + size)
+--                                (() :: Constraint)
+--                                (TypeError
+--                                   (Text
+--                                      "Construction Out of Range on Access of Type Level Lists"))
+--                            , ToListOfInts acs
+--                            , NoZero acs
+--                            , NoCloning acs)
+
+-- compose' :: [Int] -> [a] -> [a] -> [a]
+-- compose' slist selectionList restList = updatedList pairs restList
+--   where
+--     pairs = sortOn fst $ zip (pred <$> slist) selectionList
+--     updatedList p acc =
+--       case p of
+--         []        -> acc
+--         (i, x):xs -> updatedList xs $ take i acc ++ [x] ++ drop i acc
+
+-- compose ::
+--      forall acs n a. ValidComposer acs n
+--   => NList a n
+--   -> NList a (Length acs)
+--   -> NList a (Length acs + n)
+-- compose nlist selectionList =
+--   unsafeCoerce
+--     $ compose' term_level_sList term_level_selectionList term_level_nList
+--   where
+--     term_level_sList         = toListOfInts @acs
+--     term_level_nList         = toList nlist
+--     term_level_selectionList = toList selectionList

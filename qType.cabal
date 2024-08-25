@@ -37,8 +37,10 @@ library quantum
 
         Virt.Value
         Virt.Label
+        Virt.QAction
 
         Gates.Gates
+        Gates.Actions
         
 
     build-depends:   
