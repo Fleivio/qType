@@ -1,15 +1,15 @@
-module Ref.Ref
+module Core.QR
   ( mkQR
   , QR(..)
   , qrApp
   , printQR
   , showQR
-  , module Value.Operator
+  , module Core.Operator
   , qrFromList
   ) where
 
 import Data.IORef
-import Value.Operator
+import Core.Operator
 
 newtype QR a s =
   QR (IORef (QV a s))

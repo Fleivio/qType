@@ -1,12 +1,12 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns #-}
-module Ref.Observation
+module Core.Observation
   ( observeV
   , observeRef
   , observeN
-  , module Ref.Ref
+  , module Core.QR
   ) where
 
-import           Ref.Ref
+import           Core.QR
 
 import           Data.IORef
 import           Data.List     (find)

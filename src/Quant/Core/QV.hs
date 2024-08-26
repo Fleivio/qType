@@ -1,4 +1,4 @@
-module Value.Value
+module Core.QV
   ( QV
   , getProb
   , (&*)
@@ -6,12 +6,12 @@ module Value.Value
   , showQV
   , norm
   , normalize
-  , module Value.PA
-  , module Value.Basis
+  , module Core.PA
+  , module Core.Basis
   ) where
 
-import           Value.Basis
-import           Value.PA
+import           Core.Basis
+import           Core.PA
 
 import           Data.List
 import           Data.Map    as Map

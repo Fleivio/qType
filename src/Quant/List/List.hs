@@ -1,11 +1,9 @@
-module Value.List
-  ( NList(..)
+module List.List
+  ( NList(..), (<+>)
   , module Data.Kind
   , module GHC.TypeLits
   , module Unsafe.Coerce
   , module Data.Type.Equality
-  , (<+>)
-  , (<!!>)
   , At
   , decompose
   , CountTo
@@ -15,61 +13,15 @@ module Value.List
   , ValidSubset
   ) where
 
+import List.NList
+
 import           Data.Kind
-
-
--- import           Data.List          (sortOn)
 import           Data.Proxy
 import           Data.Type.Equality
 import           Fcf                hiding (Length, type (+), type (-),
                                      type (<=))
 import           GHC.TypeLits
 import           Unsafe.Coerce
-
-default (Int)
-
-type NList :: Type -> Natural -> Type
-
-data NList a s where
-  NNil :: NList a 0
-  (:>) :: a -> NList a s -> NList a (s + 1)
-
-infixr 3 :>
-
-instance Show a => Show (NList a s)
- where
-  show NNil      = ""
-  show (a :> as) = show a ++ show as
-
-instance Eq a => Eq (NList a s)
- where
-  NNil == NNil           = True
-  (a :> as) == (b :> bs) = a == b && as == unsafeCoerce bs
-  _ == _                 = False
-
-instance Ord a => Ord (NList a s)
- where
-  compare NNil NNil = EQ
-  compare (a :> as) (b :> bs) =
-    case compare a b of
-      EQ -> compare as $ unsafeCoerce bs
-      x  -> x
-  compare _ _ = EQ
-
-(<+>) :: NList a s -> NList a t -> NList a (s + t)
-NNil <+> a       = a
-(a :> as) <+> bs = unsafeCoerce $ a :> (as <+> bs)
-
-(<!!>) ::
-     forall a s n. (n <= (s - 1))
-  => NList a s
-  -> SNat n
-  -> a
-as <!!> SNat = toList as !! (fromIntegral . natVal $ Proxy @n)
-
-toList :: NList a t -> [a]
-toList NNil      = []
-toList (a :> as) = a : toList as
 
 class ToListOfInts (as :: [Natural]) where
   toListOfInts :: [Int]
@@ -171,38 +123,8 @@ type family Select (acs :: [Natural]) (t :: [a]) :: [a]
 
 type family ValidSubset (acs1 :: [Natural]) (acs2 :: [Natural]) (t :: Natural) :: Constraint
   where
-    ValidSubset acs1 acs2 t = (ValidDecomposer acs2 t, ValidDecomposer acs1 (Length acs2), ValidDecomposer acs1 t)
+    ValidSubset acs1 acs2 t 
+      = (ValidDecomposer acs2 t, 
+        ValidDecomposer acs1 (Length acs2), 
+        ValidDecomposer (Select acs1 acs2) t)
 
--- type family ValidComposer (accessors :: [Natural]) (size :: Natural) :: Constraint
---  where
---   ValidComposer acs size = ( If
---                                (Maximum acs <=? Length acs + size)
---                                (() :: Constraint)
---                                (TypeError
---                                   (Text
---                                      "Construction Out of Range on Access of Type Level Lists"))
---                            , ToListOfInts acs
---                            , NoZero acs
---                            , NoCloning acs)
-
--- compose' :: [Int] -> [a] -> [a] -> [a]
--- compose' slist selectionList restList = updatedList pairs restList
---   where
---     pairs = sortOn fst $ zip (pred <$> slist) selectionList
---     updatedList p acc =
---       case p of
---         []        -> acc
---         (i, x):xs -> updatedList xs $ take i acc ++ [x] ++ drop i acc
-
--- compose ::
---      forall acs n a. ValidComposer acs n
---   => NList a n
---   -> NList a (Length acs)
---   -> NList a (Length acs + n)
--- compose nlist selectionList =
---   unsafeCoerce
---     $ compose' term_level_sList term_level_selectionList term_level_nList
---   where
---     term_level_sList         = toListOfInts @acs
---     term_level_nList         = toList nlist
---     term_level_selectionList = toList selectionList

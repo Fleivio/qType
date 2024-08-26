@@ -1,11 +1,11 @@
 module Quant( 
-  NList(..), Bin(..), Key, mkQ, printQ,
-   m1, m2
+  NList(..), Bit(..), Key, mkQ, printQ,
+   m1
   ) where 
 
-import Virt.Value
+import Core.Value
 import Gates.Gates
-import Gates.Actions
+import List.Key
 
 
 m1 :: IO ()
@@ -17,8 +17,3 @@ m1 = do
   app _cnot qr2
   printQ qr
 
-m2 :: IO ()
-m2 = do
-  qr <- mkQ [(O:>NNil, 1)]
-  runQ (h #1) qr 
-  printQ qr

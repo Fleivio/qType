@@ -1,17 +1,15 @@
-module Virt.Value
+module Core.Value
   ( Virt(..)
-  , module Ref.Observation
-  , module Virt.Label
+  , module Core.Observation
   , mkQ
   , printQ
   , selectQ
   , app
-  , measure
   ) where
 
 import           Data.IORef
-import           Ref.Observation
-import Virt.Label
+import           Core.Observation
+-- import Virt.Label
 
 type Virt :: Type -> [Natural] -> Natural -> Type
 
@@ -19,7 +17,7 @@ data Virt a acs t where
   Virt :: ValidDecomposer acs t => QR a t -> Virt a acs t
 
 virtFromR :: ValidDecomposer (CountTo s) s => QR a s -> Virt a (CountTo s) s
-virtFromR r = Virt r
+virtFromR = Virt
 
 mkQ :: ValidDecomposer (CountTo s) s =>
      Basis (NList a s) => [(NList a s, PA)] -> IO (Virt a (CountTo s) s)
@@ -55,13 +53,13 @@ app f' (Virt (QR ptr)) = do
         , na == nb
         ]
 
-measure ::
-    forall a s t n. 
-    ValidDecomposer '[s `At` n] t
-    => Basis a
-    => Basis (NList a t)
-    => Basis (NList a (t - s `At` n))
-    => Basis (NList a (s `At` n - 1))
-    => KnownNat (s `At` n)
-    => Virt a s t -> Key n -> IO (NList a 1)
-measure (Virt qr) Key = observeN qr (SNat @(s `At` n))
+-- measure ::
+--     forall a s t n. 
+--     ValidDecomposer '[s `At` n] t
+--     => Basis a
+--     => Basis (NList a t)
+--     => Basis (NList a (t - s `At` n))
+--     => Basis (NList a (s `At` n - 1))
+--     => KnownNat (s `At` n)
+--     => Virt a s t -> Key n -> IO (NList a 1)
+-- measure (Virt qr) Key = observeN qr (SNat @(s `At` n))

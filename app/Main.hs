@@ -7,8 +7,12 @@ import Quant
 main :: IO ()
 main = do
   m1
-  m2
 
--- top level binding would be quite annoying
--- TODO: better way to handle this]
--- TODO: better errors (no repetition, etc)
+
+{- 
+TODO
+ imply that all subsets of a decomposer are also valid decomposers of the same size
+ find a monad to handle the state of the decomposer - perhaps a state-IO monad, but I doubt it
+ better way to handle top level Bitdings (lame)
+ better errors (no repetition, etc)
+-}

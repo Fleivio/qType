@@ -1,4 +1,4 @@
-module Value.PA
+module Core.PA
   ( PA
   , showPA
   , showPAMultiplicative

@@ -26,21 +26,19 @@ library quantum
         LambdaCase, MultiParamTypeClasses, PolyKinds, OverloadedLabels
 
     other-modules:
-        Value.Basis
-        Value.List
-        Value.Operator
-        Value.PA
-        Value.Value
+        Core.Basis
+        Core.Operator
+        Core.PA
+        Core.QV
+        Core.Observation
+        Core.QR
+        Core.Value
 
-        Ref.Observation
-        Ref.Ref
-
-        Virt.Value
-        Virt.Label
-        Virt.QAction
+        List.Key
+        List.List
+        List.NList
 
         Gates.Gates
-        Gates.Actions
         
 
     build-depends:   

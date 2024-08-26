@@ -1,17 +1,17 @@
-module Value.Operator
+module Core.Operator
   ( mkQop
   , appQop
   , getOpProb
   , Qop(..)
   , Qop'
-  , module Value.Value
+  , module Core.QV
   , mkQop'
   , mkCQop
   ) where
 
 import           Data.List
 import           Data.Map    as Map
-import           Value.Value
+import           Core.QV
 
 newtype Qop a s t =
   Qop (Map (NList a s, NList a t) PA)

@@ -1,19 +1,19 @@
-module Value.Basis
-  ( Basis(..), Bin(..)
-  , module Value.List
+module Core.Basis
+  ( Basis(..), Bit(..)
+  , module List.List
   ) where
 
-import           Value.List
+import           List.List
 
 class Ord a =>
       Basis a
   where
   basis :: [a]
 
-data Bin = O | I
+data Bit = O | I
   deriving (Eq, Ord)
 
-instance Show Bin where
+instance Show Bit where
   show O = "0"
   show I = "1"
 
@@ -21,7 +21,7 @@ instance Basis Bool
  where
   basis = [True, False]
 
-instance Basis Bin
+instance Basis Bit
  where
   basis = [O, I]
 

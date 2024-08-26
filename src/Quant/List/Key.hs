@@ -1,4 +1,4 @@
-module Virt.Label(Key(..)) where
+module List.Key(Key(..)) where
 
 import GHC.OverloadedLabels (IsLabel(..))
 import GHC.TypeLits
