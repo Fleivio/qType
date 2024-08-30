@@ -39,6 +39,7 @@ library quantum
         List.NList
 
         Gates.Gates
+        Gates.QAct
         
 
     build-depends:   

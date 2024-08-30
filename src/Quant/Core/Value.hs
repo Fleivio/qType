@@ -4,12 +4,13 @@ module Core.Value
   , mkQ
   , printQ
   , selectQ
-  , app
+  , appV
+  , measureV
   ) where
 
 import           Data.IORef
 import           Core.Observation
--- import Virt.Label
+import List.Key
 
 type Virt :: Type -> [Natural] -> Natural -> Type
 
@@ -33,12 +34,12 @@ selectQ ::
      => Virt a acs t -> Virt a (Select n acs) t
 selectQ = unsafeCoerce
 
-app ::
+appV ::
      forall a acs s. Basis (NList a s)
   => Basis a 
   => ValidDecomposer acs s
   => Qop a (Length acs) (Length acs) -> Virt a acs s -> IO ()
-app f' (Virt (QR ptr)) = do
+appV f' (Virt (QR ptr)) = do
   qv <- readIORef ptr
   let fqv = normalize $ appQop gf qv
   writeIORef ptr fqv
@@ -53,13 +54,13 @@ app f' (Virt (QR ptr)) = do
         , na == nb
         ]
 
--- measure ::
---     forall a s t n. 
---     ValidDecomposer '[s `At` n] t
---     => Basis a
---     => Basis (NList a t)
---     => Basis (NList a (t - s `At` n))
---     => Basis (NList a (s `At` n - 1))
---     => KnownNat (s `At` n)
---     => Virt a s t -> Key n -> IO (NList a 1)
--- measure (Virt qr) Key = observeN qr (SNat @(s `At` n))
+measureV ::
+    forall a s t n. 
+    ValidDecomposer '[s `At` n] t
+    => Basis a
+    => Basis (NList a t)
+    => Basis (NList a (t - s `At` n))
+    => Basis (NList a (s `At` n - 1))
+    => KnownNat (s `At` n)
+    => Virt a s t -> Key n -> IO (NList a 1)
+measureV (Virt qr) Key = observeN qr (SNat @(s `At` n))
