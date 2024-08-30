@@ -25,12 +25,17 @@ test :: forall n1 n2 n3 t.
   => ValidDecomposer '[n1] t
   => QAct '[n1, n2, n3] t
 test = do
-  app @'[1] h
+  app @'[2] h
+  sample
   app @'[1,2] cnot
+  sample
   app @'[1,2,3] fredkin
+  sample
 
 m2 :: IO ()
 m2 = do
   qr <- mkQ [(O:>O:>O:>O:>NNil, 1)]
-  runQ (app @'[1,2,4] test) qr
-  printQ qr
+  runQ (app @'[3,4,1] test) qr
+
+
+  
