@@ -122,4 +122,4 @@ measure :: forall n acs s.
   => QAct acs s
 measure = do 
   qv <- ask
-  liftIO $ do measureV qv (Key @n) >> return ()
+  liftIO $ measureV qv (Key @n) >> return ()
