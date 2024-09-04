@@ -10,7 +10,7 @@ module Core.Value
 
 import           Data.IORef
 import           Core.Observation
-import List.Key
+import List.SList
 
 type Virt :: Type -> [Natural] -> Natural -> Type
 
@@ -29,10 +29,9 @@ printQ (Virt qr) = do
   printQR qr
 
 selectQ ::
-  forall n a acs t. 
-    ValidDecomposer n (Length acs)
-     => Virt a acs t -> Virt a (Select n acs) t
-selectQ = unsafeCoerce
+    ValidDecomposer nacs (Length acs)
+     => SList nacs -> Virt a acs t -> Virt a (Select nacs acs) t
+selectQ _ = unsafeCoerce
 
 appV ::
      forall a acs s. Basis (NList a s)
