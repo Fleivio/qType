@@ -6,6 +6,7 @@ module List.List
   , module Data.Type.Equality
   , decompose, selectSL
   , module List.SList
+  , module List.Key
   ) where
 
 import List.NList
@@ -17,6 +18,7 @@ import           Fcf                hiding (Length, type (+), type (-),
 import           GHC.TypeLits
 import           Unsafe.Coerce
 import          List.SList
+import List.Key
 
 decompose' :: Eq a => [Int] -> [a] -> ([a], [a])
 decompose' slist nlist = (selectionList, restList)

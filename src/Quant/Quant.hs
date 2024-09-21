@@ -7,9 +7,9 @@ import Core.Value
 test :: Basis (NList Bit t) => QAct '[n1,n2,n3] t
 test = do
   sample
-  app (SNat @1 :- SNil) h
+  app (#1 :- SNil) h
   sample
-  app (SNat @1 :- SNil) h
+  app (#1 :- SNil) h
   sample
 
 t1 = do 

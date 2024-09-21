@@ -39,6 +39,7 @@ library quantum
 
         List.SList
         List.NList
+        List.Key
         List.List
 
     build-depends:   
