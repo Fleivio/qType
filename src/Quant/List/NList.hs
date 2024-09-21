@@ -1,4 +1,4 @@
-module List.NList(NList(..), (<+>), (<!!>), toList) where
+module List.NList(NList(..), (<+>), toList) where
 
 import           Data.Kind
 import           Data.Proxy
@@ -18,8 +18,8 @@ infixr 3 :>
 
 instance Show a => Show (NList a s)
  where
-  show NNil      = "#"
-  show (a :> as) = show a ++ ":>" ++ show as
+  show NNil      = ""
+  show (a :> as) = show a ++ show as
 
 instance Eq a => Eq (NList a s)
  where
@@ -39,13 +39,6 @@ instance Ord a => Ord (NList a s)
 (<+>) :: NList a s -> NList a t -> NList a (s + t)
 NNil <+> a       = a
 (a :> as) <+> bs = unsafeCoerce $ a :> (as <+> bs)
-
-(<!!>) ::
-     forall a s n. (n <= (s - 1))
-  => NList a s
-  -> SNat n
-  -> a
-as <!!> SNat = toList as !! (fromIntegral . natVal $ Proxy @n)
 
 toList :: NList a t -> [a]
 toList NNil      = []

@@ -9,7 +9,6 @@ module List.List
   ) where
 
 import List.NList
-
 import           Data.Kind
 import           Data.Proxy
 import           Data.Type.Equality

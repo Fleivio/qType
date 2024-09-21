@@ -34,6 +34,9 @@ library quantum
         Core.QV
         Core.Value
 
+        Gates.Gates
+        Gates.QAct
+
         List.SList
         List.NList
         List.List
