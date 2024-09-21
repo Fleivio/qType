@@ -1,4 +1,4 @@
-module Gates.QAct(QAct, runQ, app, x, cnot) where
+module Gates.QAct(QAct, runQ, app, x, y, z, h, p, t, s, cnot, sample, measure) where
 
 import Control.Monad.Reader
 import Gates.Gates
@@ -72,51 +72,44 @@ cnot ::
   => QAct '[n1, n2] s
 cnot = actQop _cnot
 
--- cz :: forall n1 n2 s.
---   Basis (NList Bit s) 
---   => ValidSelector '[n1, n2] s 
---   => QAct '[n1, n2] s
--- cz = actQop @'[n1, n2] _cz
+cz ::
+  Basis (NList Bit s) 
+  => QAct '[n1, n2] s
+cz = actQop _cz
 
--- entangle :: forall n1 n2 s.
---   Basis (NList Bit s) 
---   => ValidSelector '[n1, n2] s
---   => ValidSelector '[n1] s -- fix that
---   => ValidSelector '[n2] s -- fix that
---   => QAct '[n1, n2] s
--- entangle = do
---   app @'[1] h
---   app @'[1,2] cnot
+entangle :: 
+  Basis (NList Bit s)
+  => QAct '[n1, n2] s
+entangle = do
+  app (SNat @1 :- SNil) h
+  app (SNat @1 :- SNat @2 :- SNil) cnot
 
--- fredkin :: forall n1 n2 n3 s.
---   Basis (NList Bit s) 
---   => ValidSelector '[n1, n2, n3] s 
---   => QAct '[n1, n2, n3] s
--- fredkin = actQop @'[n1, n2, n3] _fredkin
+fredkin ::
+  Basis (NList Bit s) 
+  => QAct '[n1, n2, n3] s
+fredkin = actQop _fredkin
 
--- toffoli :: forall n1 n2 n3 s.
---   Basis (NList Bit s) 
---   => ValidSelector '[n1, n2, n3] s 
---   => QAct '[n1, n2, n3] s
--- toffoli = actQop @'[n1, n2, n3] _toffoli
+toffoli ::
+  Basis (NList Bit s) 
+  => QAct '[n1, n2, n3] s
+toffoli = actQop _toffoli
 
--- swap :: forall n1 n2 s.
---   Basis (NList Bit s) 
---   => ValidSelector '[n1, n2] s 
---   => QAct '[n1, n2] s
--- swap = actQop @'[n1, n2] _swap
+swap ::
+  Basis (NList Bit s) 
+  => QAct '[n1, n2] s
+swap = actQop _swap
 
--- sample :: QAct acs t
--- sample = do
---   qr <- ask
---   liftIO $ printQ qr
+sample :: QAct acs t
+sample = do
+  qr <- ask
+  liftIO $ printQ qr
 
--- measure :: forall n acs s.
---   Measureable Bit (Eval (acs !! n)) s
---   => ValidSelector '[Eval (acs !! n)] s
---   => QAct' acs s Bit
--- measure = do 
---   qv <- ask
---   liftIO $ do 
---     (k:>NNil) <- measureV qv (Key @n)
---     return k
+measure :: forall n acs s.
+  Measureable Bit (Eval (acs !! n)) s
+  -- => ValidSelector '[Eval (acs !! n)] s
+  => SNat n -> QAct' acs s Bit
+measure SNat = do 
+  qv <- ask
+  liftIO $ do 
+    (k:>NNil) <- measureV qv (SNat @n)
+    return k
