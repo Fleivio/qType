@@ -20,7 +20,7 @@ data Virt a acs t where
 virtFromR :: KnownNat s => QR a s -> Virt a (CountTo s) s
 virtFromR (qr :: QR a s) = Virt qr (sListCountTo (SNat @s))
 
-mkQ :: KnownNat s => Basis (NList a s) => [(NList a s, PA)] -> IO (Virt a (CountTo s) s)
+mkQ :: (KnownNat s, Basis a) => [(NList a s, PA)] -> IO (Virt a (CountTo s) s)
 mkQ = fmap virtFromR . qrFromList
 
 printQ :: Show a => Virt a acs t -> IO ()
@@ -32,8 +32,8 @@ selectQ ::
 selectQ sl (Virt qr acs) = Virt qr (selectSL sl acs)
 
 appV ::
-     forall a acs s. Basis (NList a s)
-  => Basis a 
+     forall a acs s. Basis a
+  => KnownNat s
   => Qop a (Length acs) (Length acs) -> Virt a acs s -> IO ()
 appV f' (Virt (QR ptr) acs) = do
   qv <- readIORef ptr

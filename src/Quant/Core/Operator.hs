@@ -34,7 +34,7 @@ mkQop' :: Ord a => [((NList a s, NList a s), PA)] -> Qop' a s
 mkQop' = Qop . fromList
 
 mkCQop ::
-     forall a s t. (Ord a, Basis (NList a s), Basis (NList a t))
+     forall a s t. (Ord a, Basis a, KnownNat s, KnownNat t)
   => (NList a s -> Bool)
   -> Qop a t t
   -> Qop a (s + t) (s + t)
@@ -55,7 +55,7 @@ mkCQop enable qop = mkQop $ unchangeCase ++ changeCase
       ]
 
 appQop ::
-     (Ord a, Basis (NList a s), Basis (NList a t))
+     (Ord a, Basis a, KnownNat t, KnownNat s)
   => Qop a s t
   -> QV a s
   -> QV a t

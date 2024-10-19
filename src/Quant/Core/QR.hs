@@ -17,10 +17,10 @@ newtype QR a s =
 mkQR :: QV a s -> IO (QR a s)
 mkQR qv = QR <$> newIORef qv
 
-qrFromList :: Basis (NList a s) => [(NList a s, PA)] -> IO (QR a s)
+qrFromList :: (Basis a, KnownNat s) => [(NList a s, PA)] -> IO (QR a s)
 qrFromList lst = mkQR $ mkQV lst
 
-qrApp :: Basis (NList a s) => Ord a => Qop a s s -> QR a s -> IO ()
+qrApp :: (Basis a, KnownNat s) => Ord a => Qop a s s -> QR a s -> IO ()
 qrApp op (QR ref) = modifyIORef ref (appQop op)
 
 showQR :: Show a => QR a s -> IO String

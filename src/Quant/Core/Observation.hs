@@ -13,7 +13,7 @@ import           Data.IORef
 import           Data.List     (find)
 import           System.Random (Random (randomR), getStdRandom)
 
-observeV :: Basis (NList a s) => QV a s -> IO (NList a s)
+observeV :: Basis a => KnownNat s => QV a s -> IO (NList a s)
 observeV v = do
   let nv = normalize v
       probs = squareModulus . getProb nv <$> basis
@@ -23,7 +23,7 @@ observeV v = do
         -- never yields Nothing due to normalization
   return res
 
-observeRef :: Basis (NList a s) => QR a s -> IO (NList a s)
+observeRef :: Basis a => KnownNat s => QR a s -> IO (NList a s)
 observeRef (QR ptr) = do
   qVal <- readIORef ptr
   observResult <- observeV qVal
@@ -31,11 +31,11 @@ observeRef (QR ptr) = do
   return observResult
 
 type Measureable a n s 
-  = (Basis (NList a s),
-    Basis (NList a (n - 1)),
-    Basis a,
-    Basis (NList a (s - n)),
-    KnownNat n)
+  = (Basis a,
+    KnownNat n,
+    KnownNat (n - 1),
+    KnownNat s,
+    KnownNat (s - n))
 
 observeN ::
      forall a s n. 

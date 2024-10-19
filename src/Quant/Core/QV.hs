@@ -18,14 +18,15 @@ import           Data.Map    as Map
 
 type QV a s = Map (NList a s) PA
 
-getProb :: Basis (NList a s) => QV a s -> NList a s -> PA
+getProb :: (Basis a, KnownNat s) => QV a s -> NList a s -> PA
 getProb qmap index = Map.findWithDefault 0 index qmap
 
 (&*) ::
      forall a s t.
-     ( Basis (NList a s)
-     , Basis (NList a t)
-     , Basis (NList a (s + t))
+     ( Basis a
+     , KnownNat s
+     , KnownNat t
+     , KnownNat (s + t)
      )
   => QV a s
   -> QV a t
@@ -37,7 +38,7 @@ qmap1 &* qmap2 =
     , y <- basis @(NList a t)
     ]
 
-mkQV :: Basis (NList a s) => [(NList a s, PA)] -> QV a s
+mkQV :: (Basis a, KnownNat s) => [(NList a s, PA)] -> QV a s
 mkQV = normalize . Map.fromList . Prelude.filter ((/= 0) . snd)
 
 showQV :: Show a => QV a s -> String

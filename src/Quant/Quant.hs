@@ -4,7 +4,7 @@ import Gates.QAct
 import List.List
 import Core.Value
 
-test :: Basis (NList Bit t) => QAct '[n1,n2,n3] t
+test :: KnownNat t => QAct '[n1,n2,n3] t
 test = do
   sample
   app (#1 :- #3 :- SNil) entangle
