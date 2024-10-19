@@ -32,12 +32,11 @@ observeRef (QR ptr) = do
 
 type Measureable a n s 
   = (Basis (NList a s),
-    Basis (NList a (n - 1)), 
+    Basis (NList a (n - 1)),
     Basis a,
     Basis (NList a (s - n)),
     KnownNat n)
 
--- indexed at 1
 observeN ::
      forall a s n. 
      Measureable a n s
@@ -57,8 +56,7 @@ observeN (QR ptr) SNat = do
       auxQval = mkQV [(a :> NNil, prob' a) | a <- basis @a]
   obsRes <- observeV auxQval
   let newVal =
-        mkQV
-          $ ([ ( unsafeCoerce $ left <+> obsRes <+> right
+        mkQV ([ ( unsafeCoerce $ left <+> obsRes <+> right
                , getProb qVal $ unsafeCoerce (left <+> obsRes <+> right))
              | left <- basis @(NList a (n - 1))
              , right <- basis @(NList a (s - n))

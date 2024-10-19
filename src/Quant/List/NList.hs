@@ -1,10 +1,8 @@
 module List.NList(NList(..), (<+>), toList) where
 
 import           Data.Kind
-import           Data.Proxy
 import           GHC.TypeLits
 import           Unsafe.Coerce
-
 
 default (Int)
 
@@ -18,8 +16,11 @@ infixr 3 :>
 
 instance Show a => Show (NList a s)
  where
-  show NNil      = ""
-  show (a :> as) = show a ++ show as
+  show as = "|" ++ go as ++ "⟩" -- braket notation :D
+    where 
+      go :: NList a s' -> String
+      go NNil      = ""
+      go (x :> xs) = show x ++ go xs
 
 instance Eq a => Eq (NList a s)
  where

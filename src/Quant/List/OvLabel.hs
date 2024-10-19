@@ -1,8 +1,8 @@
-module List.Key(SNat(..)) where
+{-# OPTIONS_GHC -Wno-orphans #-}
+module List.OvLabel() where
 
 import GHC.OverloadedLabels (IsLabel(..))
 import GHC.TypeLits
-import GHC.Natural
 
 type family SRead (s :: Symbol) :: Natural where
   -- there is problably a better way to do this

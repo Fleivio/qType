@@ -1,13 +1,11 @@
 module List.SList
-  ( SList(..), SNat(..), sListToList,  sListCountTo, Length, CountTo, Select, Eval, type (!!), ValidSelector
+  ( SList(..), sListToList,  sListCountTo, Length, CountTo, Select, Eval, type (!!), ValidSelector
   ) where
 
 import           Data.Kind
-import           Data.Type.Equality
 import Data.Proxy
 import           Fcf                hiding (type (+), Length, type (-),
                                      type (<=))
-import           Fcf.Data.List hiding (Length, Elem)
 import           GHC.TypeLits
 import Unsafe.Coerce
 
@@ -18,7 +16,7 @@ data SList acs where
 infixr 5 :-
 
 instance Show (SList acs) where
-  show sl = "@" <> show (sListToList sl)
+  show sl = "#" <> show (sListToList sl)
 
 (<++>) :: SList as -> SList bs -> SList (Eval (as ++ bs))
 SNil <++> bs = bs
@@ -38,62 +36,58 @@ sListCountTo (SNat :: SNat n) = go (Proxy @n)
             Just (SomeNat (Proxy :: Proxy m)) -> unsafeCoerce $ sListCountTo (SNat @m) <++> (SNat @n :- SNil)
             Nothing -> error "sListCountTo: impossible, this should never happen please report a bug"
 
-data ECountTo :: Natural -> Exp [Natural]
-type instance Eval (ECountTo n) = CountToImpl n
-
-type CountTo (n :: Natural) = Eval (ECountTo n)
-
-type family CountToImpl (n :: Natural) :: [Natural]
- where
-  CountToImpl 0 = '[]
-  CountToImpl n = Eval (CountToImpl (n - 1) ++ '[ n])
+type family CountTo (n :: Natural) :: [Natural]
+  where
+    CountTo 0 = '[]
+    CountTo n = n ': CountTo (n - 1)
 
 type family Length (as :: [a]) :: Natural
  where
   Length '[]      = 0
   Length (a : as) = 1 + Length as
 
-data ESelect :: [s] -> [Natural] -> Exp [s]
-type instance Eval (ESelect '[] ns) = '[]
-type instance Eval (ESelect (x ': xs) ns) = Eval (ns !! x) ': Eval (ESelect xs ns)
+type Select :: [Natural] -> [s] -> [s]
+type family Select acs ns where
+  Select '[] ns = '[]
+  Select (x ': xs) ns = (ns !! x) ': Select xs ns
 
-type Select acs ns = Eval (ESelect acs ns)
+type (!!) :: [s] -> Natural -> s 
+type family xs !! n where 
+  '[] !! n = TypeError (Text "Index out of bounds")
+  (x ': xs) !! 0 = x
+  (x ': xs) !! n = xs !! (n - 1)
 
-data (!!) :: [s] -> Natural -> Exp s
-type instance Eval ('[] !! n) = Stuck
-type instance Eval ((x ': xs) !! n)
-  = If (n == 1) x (Eval (xs !! (n - 1)))
-
-
-data Maximum :: [Natural] -> Exp Natural
-
-type instance Eval (Maximum xs) = MaximumImpl xs
-type family MaximumImpl (a :: [Natural]) :: Natural
+type Maximum :: [Natural] -> Natural
+type family Maximum a
  where
-  MaximumImpl '[]       = TypeError (Text "Unable to Eval Maximum of a empty list")
-  MaximumImpl (x : '[]) = x
-  MaximumImpl (x : xs)  = If (x <=? MaximumImpl xs) (MaximumImpl xs) x
+  Maximum '[]       = TypeError (Text "Unable to Eval Maximum of a empty list")
+  Maximum (x : '[]) = x
+  Maximum (x : xs)  = If (x <=? Maximum xs) (Maximum xs) x
 
-data Elem :: Natural -> [Natural] -> Exp Bool
-type instance Eval (Elem a as) = ElemImpl a as
-type family ElemImpl (a :: Natural) (as :: [Natural]) :: Bool
+type Elem :: Natural -> [Natural] -> Bool
+type family Elem a as
  where
-  ElemImpl a '[]      = 'False
-  ElemImpl a (a ': as) = 'True
-  ElemImpl a (b ': as) = ElemImpl a as
+  Elem a '[]      = 'False
+  Elem a (a ': as) = 'True
+  Elem a (b ': as) = Elem a as
 
-data HasRepetition :: [Natural] -> Exp Bool
-type instance Eval (HasRepetition '[]) = 'False
-type instance Eval (HasRepetition (x ': xs)) = If (Eval (Elem x xs)) 'True (Eval (HasRepetition xs))
+type HasRepetition :: [Natural] -> Bool
+type family HasRepetition xs
+ where
+  HasRepetition '[] = 'False
+  HasRepetition (x ': xs) = If (Elem x xs) 'True (HasRepetition xs)
 
-data HasZero :: [Natural] -> Exp Bool
-type instance Eval (HasZero '[]) = 'False
-type instance Eval (HasZero (x ': xs)) = If (x == 0) 'True (Eval (HasZero xs))
+type HasZero :: [Natural] -> Bool
+type family HasZero n 
+  where 
+    HasZero '[] = 'False
+    HasZero (0 ': xs) = 'True
+    HasZero (x ': xs) = HasZero xs
 
 ------------------------------------------------------------------
 
 type BoundCheck (n :: Natural) (xs :: [Natural]) 
-  = If (Eval (Maximum xs) <=? n) (() :: Constraint) 
+  = If (Maximum xs <=? n) (() :: Constraint) 
     (TypeError (
         Text "Index out of bounds on Qubit selection" 
         :$$: 
@@ -101,7 +95,7 @@ type BoundCheck (n :: Natural) (xs :: [Natural])
         ))
 
 type NoCloningCheck (xs :: [Natural]) 
-  = If (Eval (HasRepetition xs)) 
+  = If (HasRepetition xs)
     (TypeError (
         Text "No Cloning Theorem Violation" 
         :$$: 
@@ -110,7 +104,7 @@ type NoCloningCheck (xs :: [Natural])
     (() :: Constraint) 
 
 type NoZeroCheck (xs :: [Natural]) 
-  = If (Eval (HasZero xs)) 
+  = If (HasZero xs)
     (TypeError (
         Text "Zero qubit selection is not allowed" 
         :$$:
@@ -118,11 +112,7 @@ type NoZeroCheck (xs :: [Natural])
         ))
     (() :: Constraint)
 
-data EValidSelector :: Natural -> [Natural] -> Exp Constraint
-type instance Eval (EValidSelector size acs)
-  = Eval (Constraints [BoundCheck size acs,
-                       NoCloningCheck acs,
-                       NoZeroCheck acs])
 
-type ValidSelector nacs acs = Eval (EValidSelector (Length acs) nacs)
-
+type ValidSelector :: [Natural] -> [Natural] -> Constraint
+type family ValidSelector nacs acs where 
+  ValidSelector nacs acs = (BoundCheck (Length acs) nacs, NoCloningCheck nacs, NoZeroCheck nacs)

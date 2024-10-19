@@ -52,6 +52,6 @@ appV f' (Virt (QR ptr) acs) = do
 
 measureV ::
     forall a s t n. 
-     Measureable a (Eval (s !! n)) t
+     Measureable a (s !! n) t
     => Virt a s t -> SNat n -> IO (NList a 1)
-measureV (Virt qr _) SNat = observeN qr (SNat @(Eval (s !! n)))
+measureV (Virt qr _) SNat = observeN qr (SNat @(s !! n))

@@ -47,7 +47,7 @@ showQV qv =
     return
       $ case pa of
           0 -> mempty
-          _ -> showPAMultiplicative pa ++ "|" ++ show a ++ "⟩"
+          _ -> showPAMultiplicative pa ++ show a
 
 norm :: QV a s -> Double
 norm v = sqrt . sum $ probs

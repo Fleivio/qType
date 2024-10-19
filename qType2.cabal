@@ -39,7 +39,7 @@ library quantum
 
         List.SList
         List.NList
-        List.Key
+        List.OvLabel
         List.List
 
     build-depends:   
