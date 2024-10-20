@@ -95,7 +95,7 @@ sample = do
   liftIO $ printQ qr
 
 measure ::
-     forall n acs s. Measureable Bit (acs !! n) s
+     forall n acs s. KnownNat s => KnownNat (acs !!! n)
   => SNat n
   -> QAct' acs s Bit
 measure SNat = do

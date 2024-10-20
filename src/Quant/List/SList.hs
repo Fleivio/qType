@@ -1,5 +1,6 @@
 module List.SList
-  ( SList(..), sListToList,  sListCountTo, Length, CountTo, Select, Eval, type (!!), ValidSelector
+  ( SList(..), sListToList,  sListCountTo, Length, CountTo, Select, Eval, type (!!),
+   ValidSelector, type (!!!)
   ) where
 
 import           Data.Kind
@@ -36,10 +37,12 @@ sListCountTo (SNat :: SNat n) = go (Proxy @n)
             Just (SomeNat (Proxy :: Proxy m)) -> unsafeCoerce $ sListCountTo (SNat @m) <++> (SNat @n :- SNil)
             Nothing -> error "sListCountTo: impossible, this should never happen please report a bug"
 
+
+
 type family CountTo (n :: Natural) :: [Natural]
   where
     CountTo 0 = '[]
-    CountTo n = n ': CountTo (n - 1)
+    CountTo n = Eval (CountTo (n - 1) ++ '[n])
 
 type family Length (as :: [a]) :: Natural
  where
@@ -51,11 +54,17 @@ type family Select acs ns where
   Select '[] ns = '[]
   Select (x ': xs) ns = (ns !! x) ': Select xs ns
 
+-- index starts from 0
 type (!!) :: [s] -> Natural -> s 
 type family xs !! n where 
   '[] !! n = TypeError (Text "Index out of bounds")
   (x ': xs) !! 0 = x
   (x ': xs) !! n = xs !! (n - 1)
+
+-- index starts from 1
+type (!!!) :: [s] -> Natural -> s
+type family xs !!! n where 
+  xs !!! n = xs !! (n - 1)
 
 type Maximum :: [Natural] -> Natural
 type family Maximum a
@@ -112,7 +121,10 @@ type NoZeroCheck (xs :: [Natural])
         ))
     (() :: Constraint)
 
+type ValidSelectorByLength :: [Natural] -> Natural -> Constraint
+type family ValidSelectorByLength nacs size where 
+  ValidSelectorByLength nacs size = (BoundCheck size nacs, NoCloningCheck nacs, NoZeroCheck nacs)
 
 type ValidSelector :: [Natural] -> [Natural] -> Constraint
 type family ValidSelector nacs acs where 
-  ValidSelector nacs acs = (BoundCheck (Length acs) nacs, NoCloningCheck nacs, NoZeroCheck nacs)
+  ValidSelector nacs acs = ValidSelectorByLength nacs (Length acs)
