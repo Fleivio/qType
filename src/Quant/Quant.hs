@@ -1,6 +1,6 @@
 module Quant(t1) where 
 
-import Gates.QAct
+import Gates.Prefabs
 import List.List
 import Core.Value
 

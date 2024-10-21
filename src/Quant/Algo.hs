@@ -1,8 +1,7 @@
 module Algo(adder, deutsch, teleport) where
 
-import Gates.QAct
+import Gates.Prefabs
 import Core.Value
-
 
 adder :: KnownNat t 
   => QAct '[n1, n2, carryIn, carryOut] t

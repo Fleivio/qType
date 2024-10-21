@@ -36,6 +36,7 @@ library quantum
 
         Gates.Gates
         Gates.QAct
+        Gates.Prefabs
 
         List.SList
         List.NList
