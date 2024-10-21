@@ -1,6 +1,6 @@
 module List.SList
   ( SList(..), sListToList,  sListCountTo, Length, CountTo, Select, Eval, type (!!),
-   ValidSelector, type (!!!)
+   ValidSelector
   ) where
 
 import           Data.Kind
@@ -58,13 +58,9 @@ type family Select acs ns where
 type (!!) :: [s] -> Natural -> s 
 type family xs !! n where 
   '[] !! n = TypeError (Text "Index out of bounds")
-  (x ': xs) !! 0 = x
+  '[] !! 0 = TypeError (Text "Zero qubit selection is not allowed")
+  (x ': xs) !! 1 = x
   (x ': xs) !! n = xs !! (n - 1)
-
--- index starts from 1
-type (!!!) :: [s] -> Natural -> s
-type family xs !!! n where 
-  xs !!! n = xs !! (n - 1)
 
 type Maximum :: [Natural] -> Natural
 type family Maximum a

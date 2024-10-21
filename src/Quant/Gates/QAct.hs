@@ -1,5 +1,5 @@
 module Gates.QAct
-  ( QAct
+  ( QAct, liftIO
   , runQ
   , app
   , x
@@ -95,7 +95,7 @@ sample = do
   liftIO $ printQ qr
 
 measure ::
-     forall n acs s. KnownNat s => KnownNat (acs !!! n)
+     forall n acs s. KnownNat s => KnownNat (acs !! n)
   => SNat n
   -> QAct' acs s Bit
 measure SNat = do

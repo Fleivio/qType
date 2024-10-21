@@ -3,26 +3,24 @@ module Quant(t1) where
 import Gates.QAct
 import List.List
 import Core.Value
-import Control.Monad.Reader (liftIO)
+
+import Algo
 
 test :: KnownNat t => KnownNat n1 => QAct '[n1,n2,n3] t
 test = do
   sample
   app (#1 :- #2 :- SNil) entangle
+  sample
   b <- measure #1
   liftIO $ print b
   sample
 
+test2 :: KnownNat t => QAct '[n1,n2,n3,n4,n5,n6] t
+test2 = do
+  app (#1 :- #2 :- #3 :- #4 :- SNil) adder
+  sample
+
 t1 :: IO ()
 t1 = do 
-  a <- mkQ [(I:>O:>O:>NNil,1)]
-  runQ test a
-
-t2 :: IO ()
-t2 = do 
-  a <- mkQ [(I:>O:>I:>I:>NNil,1)]
-  print =<< measureV a #1
-  print =<< measureV a #2
-  print =<< measureV a #3
-  print =<< measureV a #4
-  
+  a <- mkQ [(I:>I:>I:>O:>I:>I:>NNil,1)]
+  runQ test2 a
