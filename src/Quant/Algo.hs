@@ -12,7 +12,7 @@ adder = do
   app (#2 :- #3 :- SNil) cnot
   app (#1 :- #2 :- SNil) cnot
 
-deutsch :: KnownNat t => KnownNat n1 => QAct '[n1, n2] t -> QAct '[n1, n2] t
+deutsch :: (KnownNat t, KnownNat n1) => QAct '[n1, n2] t -> QAct '[n1, n2] t
 deutsch uf = do
   app (#1 :- SNil) h
   app (#2 :- SNil) h
