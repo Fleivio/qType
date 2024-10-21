@@ -37,8 +37,6 @@ sListCountTo (SNat :: SNat n) = go (Proxy @n)
             Just (SomeNat (Proxy :: Proxy m)) -> unsafeCoerce $ sListCountTo (SNat @m) <++> (SNat @n :- SNil)
             Nothing -> error "sListCountTo: impossible, this should never happen please report a bug"
 
-
-
 type family CountTo (n :: Natural) :: [Natural]
   where
     CountTo 0 = '[]
@@ -58,7 +56,7 @@ type family Select acs ns where
 type (!!) :: [s] -> Natural -> s 
 type family xs !! n where 
   '[] !! n = TypeError (Text "Index out of bounds")
-  '[] !! 0 = TypeError (Text "Zero qubit selection is not allowed")
+  xs !! 0 = TypeError (Text "Zero index selection is not allowed")
   (x ': xs) !! 1 = x
   (x ': xs) !! n = xs !! (n - 1)
 
