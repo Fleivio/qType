@@ -1,4 +1,4 @@
-#qType
+# qType
 
 - [x] Implement length-indexed lists
 - [x] Modify previous qubit implementation to use these lists
