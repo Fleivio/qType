@@ -3,6 +3,7 @@ module Quant(t1) where
 import Gates.Prefabs
 import List.List
 import Core.Value
+import List.Quoter
 
 import Algo
 
@@ -24,3 +25,8 @@ t1 :: IO ()
 t1 = do 
   a <- mkQ [(I:>I:>I:>O:>I:>I:>NNil,1)]
   runQ test2 a
+
+  print "-----"
+
+  b <- mkQ [(O:>O:>O:>NNil,1)]
+  runQ test b

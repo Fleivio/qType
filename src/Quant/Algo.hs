@@ -2,22 +2,24 @@ module Algo(adder, deutsch, teleport) where
 
 import Gates.Prefabs
 import Core.Value
+import List.Quoter
+
 
 adder :: KnownNat t 
   => QAct '[n1, n2, carryIn, carryOut] t
 adder = do
-  app (#1 :- #2 :- #4 :- SNil) toffoli
-  app (#1 :- #2 :- SNil) cnot
-  app (#2 :- #3 :- #4 :- SNil) toffoli
-  app (#2 :- #3 :- SNil) cnot
-  app (#1 :- #2 :- SNil) cnot
+  app [qb|1 2 4|] toffoli
+  app [qb|1 2|]   cnot
+  app [qb|2 3 4|] toffoli
+  app [qb|2 3|]   cnot
+  app [qb|1 2|]   cnot
 
 deutsch :: (KnownNat t, KnownNat n1) => QAct '[n1, n2] t -> QAct '[n1, n2] t
 deutsch uf = do
-  app (#1 :- SNil) h
-  app (#2 :- SNil) h
-  app (#1 :- #2 :- SNil) uf
-  app (#1 :- SNil) h
+  app [qb|1|]   h
+  app [qb|2|]   h
+  app [qb|1 2|] uf
+  app [qb|1|]   h
   val <- measure #1
   case val of
     O -> liftIO $ print "f is constant"

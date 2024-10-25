@@ -23,7 +23,8 @@ library quantum
         DataKinds, ConstraintKinds, TypeApplications, GADTs, AllowAmbiguousTypes,
         TypeFamilies, UndecidableInstances, TypeFamilies, RankNTypes, TypeOperators, 
         StandaloneKindSignatures, FlexibleInstances, ScopedTypeVariables, FlexibleContexts,
-        LambdaCase, MultiParamTypeClasses, PolyKinds, OverloadedLabels, InstanceSigs
+        LambdaCase, MultiParamTypeClasses, PolyKinds, OverloadedLabels, InstanceSigs, TemplateHaskell
+        , QuasiQuotes
 
     other-modules:
         Core.Basis
@@ -42,6 +43,7 @@ library quantum
         List.NList
         List.OvLabel
         List.List
+        List.Quoter
 
         Algo
 
@@ -49,9 +51,9 @@ library quantum
         base ^>=4.19.1.0,
         containers,
         random,
+        template-haskell,
         first-class-families,
         mtl
-
 
     default-language: Haskell2010
 

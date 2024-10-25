@@ -122,3 +122,5 @@ type family ValidSelectorByLength nacs size where
 type ValidSelector :: [Natural] -> [Natural] -> Constraint
 type family ValidSelector nacs acs where 
   ValidSelector nacs acs = ValidSelectorByLength nacs (Length acs)
+
+
