@@ -21,6 +21,7 @@ import Gates.QAct
 import Gates.Gates
 import Core.Value
 import Control.Monad.Reader
+import Data.Proxy
 
 
 x :: KnownNat s => QAct '[ n] s

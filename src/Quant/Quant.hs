@@ -25,6 +25,7 @@ t1 :: IO ()
 t1 = do 
   a <- mkQ [(I:>I:>I:>O:>I:>I:>NNil,1)]
   runQ test2 a
+  printQ a
 
   print "-----"
 

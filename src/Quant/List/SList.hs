@@ -19,23 +19,11 @@ infixr 5 :-
 instance Show (SList acs) where
   show sl = "#" <> show (sListToList sl)
 
-(<++>) :: SList as -> SList bs -> SList (Eval (as ++ bs))
-SNil <++> bs = bs
-(a :- as) <++> bs = a :- (as <++> bs)
-
 sListToList :: SList acs -> [Int]
-sListToList SNil         = []
-sListToList ((SNat :: SNat a) :- as) = fromIntegral (natVal (SNat @a)) : sListToList as
+sListToList = unsafeCoerce
 
-sListCountTo :: SNat n -> SList (CountTo n)
-sListCountTo (SNat :: SNat n) = go (Proxy @n)
-  where
-    go :: Proxy n -> SList (CountTo n)
-    go p = case natVal p of
-      0 -> unsafeCoerce SNil
-      n -> unsafeCoerce $ case someNatVal (n-1) of
-            Just (SomeNat (Proxy :: Proxy m)) -> unsafeCoerce $ sListCountTo (SNat @m) <++> (SNat @n :- SNil)
-            Nothing -> error "sListCountTo: impossible, this should never happen please report a bug"
+sListCountTo :: forall n. SNat n -> SList (CountTo n)
+sListCountTo SNat = unsafeCoerce [1..natVal (Proxy @n)]
 
 type family CountTo (n :: Natural) :: [Natural]
   where
