@@ -3,7 +3,7 @@ module Gates.QAct
   , runQ
   , app
   , actQop
-  , orc
+  , runCirc
   ) where
 
 import           Control.Monad.Reader
@@ -11,18 +11,26 @@ import           Control.Monad.State
 import           Control.Monad
 import           Core.Value
 
-type QAct' :: [Natural] -> Natural -> Type -> Type
-type QAct' acs t a = StateT Int (ReaderT (Virt Bit acs t) IO) a
+import Data.Proxy
+import Gates.Circuit
 
+type QAct' :: [Natural] -> Natural -> Type -> Type
+type QAct' acs t a = StateT Circuit (ReaderT (Virt Bit acs t) IO) a
 
 type QAct :: [Natural] -> Natural -> Type
 type QAct acs t = QAct' acs t ()
 
-runQ :: QAct (CountTo t) t -> Virt Bit (CountTo t) t -> IO ()
-runQ qa = void . runReaderT (runStateT qa 0)
+runQ :: KnownNat t => QAct (CountTo t) t -> Virt Bit (CountTo t) t -> IO ()
+runQ qa val = void $ runCirc qa val
 
-orc :: QAct (CountTo t) t -> Virt Bit (CountTo t) t -> IO Int
-orc qa val = snd <$> runReaderT (runStateT qa 0) val
+runCirc :: forall t. KnownNat t => QAct (CountTo t) t -> Virt Bit (CountTo t) t -> IO Circuit
+runCirc qa val = snd <$> runReaderT (runStateT qa baseCircuit) val
+  where 
+    baseCircuit = mkCircuit entryCount 0
+    entryCount = fromIntegral $ natVal (Proxy @t)
+
+runQ' :: QAct' acs t a -> Virt Bit acs t -> Circuit -> IO (a, Circuit)
+runQ' qa val circ = runReaderT (runStateT qa circ) val
 
 actQop :: KnownNat s => Qop Bit (Length acs) (Length acs) -> QAct acs s
 actQop f' = do
@@ -37,6 +45,7 @@ app ::
 app sl act = do
   qv <- ask
   let adapterQv = selectQ sl qv
-  liftIO $ runQ' act adapterQv
-    where 
-      runQ' qa = void . runReaderT (runStateT qa 0)
+  circ <- get
+  (_, c2) <- liftIO $ runQ' act adapterQv circ 
+  put c2
+

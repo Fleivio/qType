@@ -14,7 +14,7 @@ module Gates.Prefabs(
   , fredkin
   , toffoli
   , swap
-  , QAct, runQ, app, liftIO)
+  , QAct, runQ, runCirc, app, liftIO)
 where
 
 import Gates.QAct 

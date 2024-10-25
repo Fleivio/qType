@@ -30,3 +30,9 @@ t1 = do
 
   b <- mkQ [(O:>O:>O:>NNil,1)]
   runQ test b
+
+  print "-----"
+
+  c <- mkQ [(O:>O:>O:>O:>O:>O:>NNil,1)]
+  cir <- runCirc test2 c
+  print cir
