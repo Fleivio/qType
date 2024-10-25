@@ -10,7 +10,7 @@
 - [x] Lift Qop functions to QAct
 - [x] Implement a monadic way to easily combine QAct's
 - [ ] Refactor type errors to be more informative
-- [ ] Make less verbose calls to app function (now it needs to receive an explicit SList definition)
-  - [ ] Idea 1: Use quasiquotation
+- [x] Make less verbose calls to app function (now it needs to receive an explicit SList definition)
+  - [x] Idea 1: Use quasiquotation
   - [ ] Idea 2: Polyvariadic `add` function with associated type families (is this possible, though?)
 - [ ] (?) Refactor length-indexed lists operations as first-class type families
