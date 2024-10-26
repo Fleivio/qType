@@ -18,10 +18,8 @@ import           Unsafe.Coerce
 import           List.SList
 import List.OvLabel () -- for convenience
 
-import Debug.Trace
-
 decompose' :: Eq a => [Int] -> [a] -> ([a], [a])
-decompose' slist nlist = trace (show slist) (selectionList, restList)
+decompose' slist nlist = (selectionList, restList)
   where
     selectionList = flip (!!) . pred <$> slist <*> pure nlist
     restList      = map snd $ filter ((`notElem` slist) . fst) $ [1 ..] `zip` nlist
