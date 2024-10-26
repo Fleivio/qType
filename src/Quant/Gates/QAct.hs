@@ -3,6 +3,7 @@ module Gates.QAct
   , runQ
   , app
   , actQop
+  , getCurrentIndexes
   ) where
 
 import           Control.Monad.Reader
@@ -31,3 +32,8 @@ app sl act = do
   qv <- ask
   let adapterQv = selectQ sl qv
   lift $ runReaderT act adapterQv
+
+getCurrentIndexes :: QAct' acs t [Int]
+getCurrentIndexes = do
+  Virt _ acs <- ask
+  return $ unsafeCoerce acs
