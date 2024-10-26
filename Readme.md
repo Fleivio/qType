@@ -14,3 +14,9 @@
   - [x] Idea 1: Use quasiquotation
   - [ ] Idea 2: Polyvariadic `add` function with associated type families (is this possible, though?)
 - [ ] (?) Refactor length-indexed lists operations as first-class type families
+
+## Future work
+
+- [ ] Combine a State Monad with QAct to extract a circuit graphical representantion from a QAct
+- [ ] Implement a way to generalize QAct to handle a varying number of qubits, such as necessary for Grover algorithm
+- [ ] Improve performance of the underlying data structure used to represent qubits (currently using linked-lists)

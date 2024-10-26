@@ -3,6 +3,7 @@ module Gates.QAct
   , runQ
   , app
   , actQop
+  , getCurrentIndexes
   , runCirc
   ) where
 
@@ -49,3 +50,9 @@ app sl act = do
   (_, c2) <- liftIO $ runQ' act adapterQv circ 
   put c2
 
+
+
+getCurrentIndexes :: QAct' acs t [Int]
+getCurrentIndexes = do
+  Virt _ acs <- ask
+  return $ unsafeCoerce acs

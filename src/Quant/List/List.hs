@@ -26,6 +26,7 @@ decompose' slist nlist = trace (show slist) (selectionList, restList)
     selectionList = flip (!!) . pred <$> slist <*> pure nlist
     restList      = map snd $ filter ((`notElem` slist) . fst) $ [1 ..] `zip` nlist
 
+-- called on appV to decompose the qubits of a Virt into the required qubits and the rest
 decompose ::
      forall acs n a. Eq a =>
   SList acs
@@ -37,6 +38,7 @@ decompose sl nlist = (unsafeCoerce selectionList, unsafeCoerce restList)
     term_level_nList          = toList nlist
     (selectionList, restList) = decompose' term_level_sList term_level_nList
 
+-- called every app in QAct to select the required qubits from the total qubits
 selectSL :: forall nacs acs. SList nacs -> SList acs -> SList (Select nacs acs)
 selectSL sl targ = unsafeCoerce $ fst $ decompose' selectionList targetList
   where
