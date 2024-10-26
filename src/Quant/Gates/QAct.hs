@@ -4,34 +4,36 @@ module Gates.QAct
   , app
   , actQop
   , getCurrentIndexes
-  , runCirc
+  , runHist
+  , tell
   ) where
 
 import           Control.Monad.Reader
-import           Control.Monad.State
+import           Control.Monad.Writer
 import           Control.Monad
 import           Core.Value
 
 import Data.Proxy
-import Gates.Circuit
+import Gates.History
 
 type QAct' :: [Natural] -> Natural -> Type -> Type
-type QAct' acs t a = StateT Circuit (ReaderT (Virt Bit acs t) IO) a
+type QAct' acs t a = WriterT OpHistory (ReaderT (Virt Bit acs t) IO) a
 
 type QAct :: [Natural] -> Natural -> Type
 type QAct acs t = QAct' acs t ()
 
+-- execute a quantum operation and discard the history
 runQ :: KnownNat t => QAct (CountTo t) t -> Virt Bit (CountTo t) t -> IO ()
-runQ qa val = void $ runCirc qa val
+runQ qa val = void $ runHist qa val
 
-runCirc :: forall t. KnownNat t => QAct (CountTo t) t -> Virt Bit (CountTo t) t -> IO Circuit
-runCirc qa val = snd <$> runReaderT (runStateT qa baseCircuit) val
-  where 
-    baseCircuit = mkCircuit entryCount 0
-    entryCount = fromIntegral $ natVal (Proxy @t)
+-- execute a quantum operation and return the history
+runHist :: 
+  forall t. KnownNat t => QAct (CountTo t) t -> Virt Bit (CountTo t) t -> IO OpHistory
+runHist = runHist'
 
-runQ' :: QAct' acs t a -> Virt Bit acs t -> Circuit -> IO (a, Circuit)
-runQ' qa val circ = runReaderT (runStateT qa circ) val
+runHist' :: 
+  forall t acs. QAct acs t -> Virt Bit acs t -> IO OpHistory
+runHist' qa val = snd <$> runReaderT (runWriterT qa) val
 
 actQop :: KnownNat s => Qop Bit (Length acs) (Length acs) -> QAct acs s
 actQop f' = do
@@ -46,11 +48,8 @@ app ::
 app sl act = do
   qv <- ask
   let adapterQv = selectQ sl qv
-  circ <- get
-  (_, c2) <- liftIO $ runQ' act adapterQv circ 
-  put c2
-
-
+  hist <- liftIO $ runHist' act adapterQv
+  tell hist
 
 getCurrentIndexes :: QAct' acs t [Int]
 getCurrentIndexes = do

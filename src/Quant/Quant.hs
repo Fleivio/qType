@@ -23,17 +23,17 @@ test2 = do
 
 t1 :: IO ()
 t1 = do 
-  a <- mkQ [(I:>I:>I:>O:>I:>I:>NNil,1)]
-  runQ test2 a
-  printQ a
+  -- a <- mkQ [(I:>I:>I:>O:>I:>I:>NNil,1)]
+  -- runQ test2 a
+  -- printQ a
 
-  print "-----"
+  -- print "-----"
 
-  b <- mkQ [(O:>O:>O:>NNil,1)]
-  runQ test b
+  -- b <- mkQ [(O:>O:>O:>NNil,1)]
+  -- runQ test b
 
-  print "-----"
+  -- print "-----"
 
-  c <- mkQ [(O:>O:>O:>O:>O:>O:>NNil,1)]
-  cir <- runCirc test2 c
+  c <- mkQ [(I:>I:>I:>NNil,1)]
+  cir <- runHist teleport c
   print cir

@@ -37,7 +37,7 @@ library quantum
 
         Gates.Gates
         Gates.QAct
-        Gates.Circuit
+        Gates.History
         Gates.Prefabs
 
         List.SList
