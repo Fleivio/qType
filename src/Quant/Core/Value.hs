@@ -4,6 +4,7 @@ module Core.Value
   , module Core.Observation
   , mkQ
   , printQ
+  , showQ
   , selectQ
   , appV
   , measureV
@@ -26,6 +27,10 @@ mkQ = fmap virtFromR . qrFromList
 printQ :: Show a => Virt a acs t -> IO ()
 printQ (Virt qr _) = do
   printQR qr
+
+showQ :: Show a => Virt a acs t -> IO String
+showQ (Virt qr _) = do
+  showQR qr
 
 selectQ ::
   forall nacs a acs t. SList nacs -> Virt a acs t -> Virt a (Select nacs acs) t

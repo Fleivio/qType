@@ -34,6 +34,6 @@ t1 = do
 
   -- print "-----"
 
-  c <- mkQ [(I:>I:>I:>NNil,1)]
-  cir <- runHist teleport c
+  c <- mkQ [(O:>O:>O:>NNil,1), (I:>O:>O:>NNil,1)]
+  cir <- runHist (teleport) c
   print cir

@@ -13,7 +13,6 @@ import           Control.Monad.Writer
 import           Control.Monad
 import           Core.Value
 
-import Data.Proxy
 import Gates.History
 
 type QAct' :: [Natural] -> Natural -> Type -> Type

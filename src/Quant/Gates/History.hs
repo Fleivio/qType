@@ -7,6 +7,7 @@ data OpRep =
   | CircledPlus Int
   | FullCircle Int
   | Measure Int
+  | Sample String
 
 instance Show OpRep where
   show (ClusterOp ops) = "ClusterOp " ++ show ops
@@ -15,5 +16,6 @@ instance Show OpRep where
   show (CircledPlus i) = "CircledPlus " ++ show i
   show (FullCircle i) = "FullCircle " ++ show i
   show (Measure i) = "Measure " ++ show i
+  show (Sample s) = "Sample " ++ s
 
 type OpHistory = [OpRep]

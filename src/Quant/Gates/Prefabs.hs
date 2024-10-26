@@ -105,7 +105,9 @@ fredkin = do
 sample :: QAct acs t
 sample = do
   qr <- ask
-  liftIO $ printQ qr
+  str <- liftIO $ showQ qr
+  liftIO $ putStrLn str
+  tell [Sample str]
 
 measure ::
      forall n acs s. KnownNat s => KnownNat (acs !! n)
